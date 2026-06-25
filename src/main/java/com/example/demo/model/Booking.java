@@ -38,6 +38,9 @@ public class Booking {
 
     private BigDecimal totalPrice;
 
+    @Builder.Default
+    private boolean hasReviewed = false; // Đánh dấu đã review hay chưa
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 }

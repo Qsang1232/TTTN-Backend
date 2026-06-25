@@ -35,6 +35,7 @@ public class BookingController {
                 .endTime(booking.getEndTime())
                 .totalPrice(booking.getTotalPrice())
                 .status(booking.getStatus())
+                .hasReviewed(booking.isHasReviewed())
                 .build();
     }
 

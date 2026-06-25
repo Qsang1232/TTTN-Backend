@@ -55,6 +55,10 @@ public class ReviewService {
                 .rating(request.getRating())
                 .comment(request.getComment())
                 .build();
+                
+        // 6. Đánh dấu đơn này đã được review
+        booking.setHasReviewed(true);
+        bookingRepository.save(booking);
 
         return reviewRepository.save(review);
     }

@@ -12,7 +12,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -31,8 +30,8 @@ public class SecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer() {
         // Chỉ bỏ qua quét Token đối với việc truy cập xem file tĩnh trực tiếp
         return (web) -> web.ignoring().requestMatchers(
-                new AntPathRequestMatcher("/uploads/**"), 
-                new AntPathRequestMatcher("/images/**")
+                "/uploads/**", 
+                "/images/**"
         );
     }
 
@@ -54,8 +53,11 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/bookings/check-availability").permitAll()
 
                 // Cấu hình xem ảnh tĩnh trực tiếp (dự phòng nếu webCustomizer bị trượt)
-            // Cho phép lấy ảnh công khai bất kể lưu ở thư mục nào
-.requestMatchers(HttpMethod.GET, "/uploads/**", "/images/**", "/api/upload/**").permitAll()
+                // Cho phép lấy ảnh công khai bất kể lưu ở thư mục nào
+                .requestMatchers(HttpMethod.GET, "/uploads/**", "/images/**", "/api/upload/**").permitAll()
+
+                // MỞ CÔNG KHAI ENDPOINT CALLBACK CỦA VNPAY (Trình duyệt từ VNPay trả về không có Token)
+                .requestMatchers(HttpMethod.GET, "/api/payment/vnpay-return").permitAll()
 
                 // PHÂN QUYỀN QUẢN TRỊ ADMIN
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")

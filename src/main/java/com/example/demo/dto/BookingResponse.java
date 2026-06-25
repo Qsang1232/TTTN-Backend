@@ -27,4 +27,5 @@ public class BookingResponse {
     private LocalDateTime endTime;
     private BigDecimal totalPrice;
     private String status; 
+    private boolean hasReviewed;
 }

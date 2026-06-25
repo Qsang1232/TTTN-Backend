@@ -41,13 +41,28 @@ public class BookingService {
 
         // 1. Validate thời gian
         if (startTime.isAfter(endTime) || startTime.isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("Thời gian đặt không hợp lệ!");
+            throw new RuntimeException("Thời gian đặt không hợp lệ! Vui lòng chọn giờ trong tương lai.");
+        }
+
+        // 1.1 Validate giờ mở/đóng cửa
+        if (court.getOpeningTime() != null && court.getClosingTime() != null) {
+            java.time.LocalTime reqStart = startTime.toLocalTime();
+            java.time.LocalTime reqEnd = endTime.toLocalTime();
+            
+            if (reqStart.isBefore(court.getOpeningTime())) {
+                throw new RuntimeException(String.format("Sân chưa mở cửa! Sân chỉ hoạt động từ %s đến %s.", 
+                    court.getOpeningTime().toString(), court.getClosingTime().toString()));
+            }
+            if (reqEnd.isAfter(court.getClosingTime())) {
+                throw new RuntimeException(String.format("Sân đã đóng cửa! Sân chỉ hoạt động từ %s đến %s.", 
+                    court.getOpeningTime().toString(), court.getClosingTime().toString()));
+            }
         }
 
         // 2. Check trùng
         boolean isConflict = bookingRepository.existsConflictingBooking(courtId, startTime, endTime);
         if (isConflict) {
-            throw new RuntimeException("Khung giờ này đã có người đặt rồi! Vui lòng chọn giờ khác.");
+            throw new RuntimeException("Giờ này đã được đặt, xin vui lòng đặt giờ khác!");
         }
 
         // 3. Tính tiền
@@ -109,10 +124,10 @@ public class BookingService {
             }
             
             // User thường: Phải hủy trước 2 tiếng
-            // LocalDateTime now = LocalDateTime.now();
-            // if (booking.getStartTime().isBefore(now.plusHours(2))) {
-            //    throw new RuntimeException("Chỉ được hủy trước giờ chơi 2 tiếng!");
-            // }
+            LocalDateTime now = LocalDateTime.now();
+            if (booking.getStartTime().isBefore(now.plusHours(2))) {
+               throw new RuntimeException("Chỉ được hủy trước giờ chơi 2 tiếng!");
+            }
         }
 
         booking.setStatus("CANCELLED");

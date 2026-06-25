@@ -57,4 +57,33 @@ public class Court {
         map.put("name", category.getName());
         return map;
     }
+
+    @OneToMany(mappedBy = "court", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    @lombok.ToString.Exclude
+    @lombok.EqualsAndHashCode.Exclude
+    private java.util.List<Booking> bookings;
+
+    @OneToMany(mappedBy = "court", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    @lombok.ToString.Exclude
+    @lombok.EqualsAndHashCode.Exclude
+    private java.util.List<Review> reviews;
+
+    // 3. Tính toán số sao trung bình và lượt đánh giá để xuất ra giao diện
+    @JsonProperty("reviewStats")
+    public Map<String, Object> getReviewStats() {
+        Map<String, Object> map = new HashMap<>();
+        if (reviews == null || reviews.isEmpty()) {
+            map.put("count", 0);
+            map.put("average", 5.0);
+            return map;
+        }
+        int count = reviews.size();
+        double sum = reviews.stream().mapToInt(Review::getRating).sum();
+        double average = Math.round((sum / count) * 10.0) / 10.0;
+        map.put("count", count);
+        map.put("average", average);
+        return map;
+    }
 }
